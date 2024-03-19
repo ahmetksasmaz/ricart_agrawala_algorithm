@@ -1,2 +1,2 @@
-.. |Ricart-Agrawala| replace:: Distributed Algorithm Name 
+.. |DistAlgName| replace:: Ricart-Agrawala Algorithm
 

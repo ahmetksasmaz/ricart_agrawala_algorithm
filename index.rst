@@ -5,7 +5,7 @@
 
 .. include:: docs/ricart_agrawala/substitutions.rst
 
-|Ricart-Agrawala|
+|DistAlgName|
 =======================================================================================
 
 .. toctree::

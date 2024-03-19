@@ -1,6 +1,6 @@
 .. include:: substitutions.rst
 
-|Ricart-Agrawala|
+|DistAlgName|
 =========================================
 
 
@@ -10,7 +10,7 @@ Background and Related Work
 
 Present any background information survey the related work. Provide citations.
 
-Distributed Algorithm: |Ricart-Agrawala| 
+Distributed Algorithm: |DistAlgName|
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An example distributed algorithm for broadcasting on an undirected graph is presented in  :ref:`Algorithm <BlindFloodingAlgorithmLabel>`.
@@ -63,7 +63,7 @@ Present theoretic complexity results in terms of number of messages and computat
 
     **Chandy-Lamport Snapshot Algorithm:**
 
-    The Chandy-Lamport :ref:`Algorithm <ChandyLamportSnapshotAlgorithm>` [Lamport1985]_ , proposed by Leslie Lamport and K. Mani Chandy, aims to capture a consistent global state of a distributed system without halting its execution. It operates by injecting markers into the communication channels between processes, which propagate throughout the system, collecting local states as they traverse. Upon reaching all processes, these markers signify the completion of a global snapshot. This algorithm requires FIFO channels. There are no failures and all messages arrive intact and only once. Any process may initiate the snapshot algorithm. The snapshot algorithm does not interfere with the normal execution of the processes. Each process in the system records its local state and the state of its incoming channels.
+    The Chandy-Lamport :ref:`Algorithm <RicartAgrawala>` [Lamport1985]_ , proposed by Leslie Lamport and K. Mani Chandy, aims to capture a consistent global state of a distributed system without halting its execution. It operates by injecting markers into the communication channels between processes, which propagate throughout the system, collecting local states as they traverse. Upon reaching all processes, these markers signify the completion of a global snapshot. This algorithm requires FIFO channels. There are no failures and all messages arrive intact and only once. Any process may initiate the snapshot algorithm. The snapshot algorithm does not interfere with the normal execution of the processes. Each process in the system records its local state and the state of its incoming channels.
 
     1. **Marker Propagation:** When a process initiates a snapshot, it sends markers along its outgoing communication channels.
     2. **Recording Local States:** Each process records its local state upon receiving a marker and continues forwarding it.
@@ -116,8 +116,8 @@ Present theoretic complexity results in terms of number of messages and computat
 
     **Complexity:**
 
-    1. **Time Complexity**  The Chandy-Lamport :ref:`Algorithm <ChandyLamportSnapshotAlgorithm>` takes at most O(D) time units to complete where D is ...
-    2. **Message Complexity:** The Chandy-Lamport :ref:`Algorithm <ChandyLamportSnapshotAlgorithm>` requires 2|E| control messages.
+    1. **Time Complexity**  The Chandy-Lamport :ref:`Algorithm <RicartAgrawala>` takes at most O(D) time units to complete where D is ...
+    2. **Message Complexity:** The Chandy-Lamport :ref:`Algorithm <RicartAgrawala>` requires 2|E| control messages.
 
 
     **Lai-Yang Snapshot Algorithm:**
