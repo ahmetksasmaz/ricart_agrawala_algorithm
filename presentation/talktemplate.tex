@@ -35,7 +35,7 @@
 \def\false{\textbf{F}}
 
 
-\author[John Doe]{John Doe\\\href{mailto:john@example.com}{john@example.com}}
+\author[Ahmet Kürşad Şaşmaz]{Ahmet Kürşad Şaşmaz\\\href{mailto:kursad.sasmaz@metu.edu.tr}{kursad.sasmaz@metu.edu.tr}}
 %\author[J.\,Doe \& J.\,Doe]
 %{%
 %  \texorpdfstring{
@@ -53,8 +53,8 @@
 %  {John Doe \& Jane Doe}
 %}
 
-\title[WINS Beamer Template]{WINS Lab Beamer Presentation Template}
-\subtitle[Short SubTitle]{How to Prepare a Nice Presentation}
+\title[Ricart-Argawala Algorithm]{Ricart-Argawala Algorithm}
+\subtitle[Mutual Exclusion in Distributed Systems]{Mutual Exclusion in Distributed Systems}
 %\date{} 
 
 \begin{document}
@@ -96,118 +96,238 @@
 %        \sectionpage
 %\end{frame}
 
-\begin{frame}{The problem}
-\framesubtitle{Tell a \alert{STORY} from the background to the conclusion}
-\begin{block}{The Problem Name} 
-Explain the problem here. Instead of using the term `The problem'', please use specific name for the problem. Tell us a story. Provide a picture for the scenario depicting the problem. Set the scene for average audience.
+\begin{frame}{The Problem}
+\framesubtitle{Selecting owner of a resource without any conflict}
+\begin{block}{Mutual Exclusion in Distributed Systems} 
+Mutual exclusion in distributed systems refers to the challenge of properly accessing a shared resource at any given time by different concurrent processes on different machines. The motivation is ensuring that only one process holds the resource and this resource is orderly accessed for all participants in the system by using coordination and synchronization systems.
 \end{block}
-Spend at least \textbf{1.5-2 minutes per slide} on average.
-
-The introduction should be something like ``I will be presenting title of talk. This is joint work with your colleagues or advisor at institution.'' 
 \note{}
 \end{frame}
 
-\section{The Contribution}
+\section{Our Motivation}
 \begin{frame}
-\frametitle{What is the solution/contribution}
-\framesubtitle{}
-Explain \textbf{YOUR} contributions. Go top-down. Give the brief introduction to the contributions at the beginning of the presentation. A slide should have no more than five to six lines of text or bullets. Prefer figures instead of text: A picture is worth a thousand words.
+\frametitle{Our Motivation}
+\framesubtitle{It is better to declare everyone that you wanted first.}
+Imagine a server with limited CPUs. And as having a bad CEO, the only communication channel for prioritizing users is a chat application. You and your co-workers are agreed on some rules:
 \begin{itemize}
-\item Communicate the Key Ideas
-\item Don’t get Bogged Down in Details
-\item Use a Top-down Approach
+    \item If someone requests the resource, the ones are not using and the ones are not currently interested in using will reply "OK!" immediately.
+    \item If someone has things to do with the resource but not wanted first is also reply as "OK!"
+    \item No one can use the resource without ensuring that no one is currently interested or using.
+    \item Anyone has to inform the concerned ones in the time of using the resource after releasing it
+\end{itemize}
+\end{frame}
+\note{}
+
+\section{The Proposed Solution}
+\begin{frame}
+\frametitle{The Proposed Solution}
+\framesubtitle{}
+
+This innovative approach tackles the complexities of coordinating critical section access across multiple nodes, overcoming hurdles like network communication and synchronization. Using timestamps to guide communication, this algorithm elegantly orchestrates interactions between nodes, guaranteeing smooth and fair resource sharing.
+
+That has advantages in terms of:
+
+\begin{itemize}
+\item Communication efficiency
+\item Message complexity
+\item Timestamp prioritization
 \end{itemize}
 
-The audience will remember at most one single message \textbf{Which message you want to audience to remember? Can you express this message in less than a minute in an elevator?}
-
 \end{frame}
 
 
-\section{Motivation/Importance}
-\begin{frame}
-\frametitle{Motivation/Importance}
-\framesubtitle{``Gain upon solving the problem, pain if not solved'' should be explained}
-Explain why the problem is so important. Throw in a little philosophy if necessary. How does the problem fit into the larger picture? If it involves a model of a real-world phenomenon, then how good is the model? What are its applications? What makes the problem nontrivial? You can return to these issues in the Conclusion, when you can re-address them with the benefit of hindsight.
-\end{frame}
-
-\section{Background/Model/Definitions/Previous Works}
+\section{Background Information and Previous Works}
 
 
-\subsection{Model, Definitions}
+\subsection{Background Information}
 
 \frame{
-\frametitle{Model, Definitions}
-\framesubtitle{Formal definition of a Stochastic Process}
-The use of terminology and jargon should be kept to a minimum, but is impossible to avoid entirely. All terms must be introduced early. It is also useful to remind the audience of the definitions at critical points later in the talk.
+\frametitle{Background Information}
+In distributed systems, mutual exclusion is crucial for preventing race conditions, ensuring that only one process can
+access a critical section at any given time.
 
-Background and this slide can be combined....
+Requirements for a mutual exclusion algorithm in distributed systems are:
+\begin{itemize}
+    \item \textbf{No Deadlock:} Ensure processes don’t indefinitely wait for messages.
+    \item \textbf{No Starvation:} Every process should have a chance to execute its critical section in finite time.
+    \item \textbf{Fairness:} Requests to execute critical sections should be executed in the order they arrive.
+    \item \textbf{Fault Tolerance:} The system should recognize failures and continue functioning without disruption.
+\end{itemize}
 }
 
-\subsection{Background, Previous Works}
-\begin{frame}{Background}
-Research is not usually carried out in a vacuum. There will almost always be other relevant or related work, which you should describe. Present an orderly synopsis of these previously- obtained results. A table is often used for this purpose. Be sure to mention the author of each paper and its date of publication. \textbf{Compare and contrast them with each other and with your paper.}
+\subsection{Previous Works}
+\begin{frame}{Previous Works}
+
+Previous works are based on different methods.
+
+\begin{itemize}
+    \item \textbf{Token Based Algorithm:} Uses a unique token shared among sites, allowing possession of the token to enter the critical section. Examples include the Suzuki-Kasami Algorithm and Raymond’s Algorithm.
+    \item \textbf{Non-token based approach:} Sites communicate to determine which should execute the critical section next, using timestamps to order requests. Examples include the Ricart-Agrawala Algorithm explained in this presentation.
+    \item \textbf{Quorum based approach:} Sites request permission from a subset called a quorum, ensuring mutual exclusion through common subsets. Examples include Maekawa’s Algorithm.
+\end{itemize}
+
 \end{frame}
 
 
 
 
-\section{Contribution}
-\subsection{Main Point 1}
-\begin{frame}{Main Point 1: A Figure}
-\framesubtitle{Abstract the Major Results}
-Describe the key results of the paper. You may present the statements of the major theorems, but not their proofs. You will probably have to get a little technical here, but do so gradually and carefully.
+\section{The Algorithm}
+\subsection{Algorithm Description}
+\begin{frame}{Algorithm Description}
+Ricart-Argawala Algorithm is based on fully connected topology. Every node has these features:
 
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.5]{figures/Chick1.png}
-    \caption{Awesome Image}
-    \label{fig:awesome_image}
-\end{figure}
-\note{
-}
+\begin{itemize}
+    \item Connection to every other nodes
+    \item Timestamp prioritization
+\end{itemize}
+
 \end{frame}
 
 
-\subsection{Main Point 2}
+\subsection{Pseudocode}
 
 \begin{frame}
-\frametitle{An Example Distributed Algorithm}
-\framesubtitle{Blind Flooding}
-
-
-Blind flooding on an undirected graph is presented in Algorithm~\ref{alg:blindflooding}.
+\frametitle{Algorithm Pseudocode Part 1}
 
 \begin{center}
 \begin{algorithm}[H]
 	\scriptsize
-	\def\algorithmlabel{BlindFlooding}
+	\def\algorithmlabel{Ricart-Agrawala}
     \caption{\algorithmlabel\ algorithm}
-    \label{alg:blindflooding}
+    \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
     	\Implement {\algorithmlabel}{cf} 
-    	\Use {LinkLayerBroadcast} {lbc} 
-    	\Events{Init, MessageFromTop, MessageFromBottom}
-	\Need {}
-
-        \Event {Init}{}
-        		
-        \Event{MessageFromBottom} { $m$ }
-        		\Trig{lbc}{Broadcast} { $m$  }
-        		
-        \Event{MessageFromTop} { $m$ }	
-        		\Trig{lbc}{Broadcast} { $m$  }
+    	\Use {List of Channels} {deferred\_channels} 
+    	\Use {Integer} {total\_channel\_number} 
+    	\Use {Integer} {reply\_count} 
+    	\Use {Timestamp} {request\_timestamp}
+    	\Use {Boolean} {using\_critical\_section}
+        \Use {Boolean} {has\_privilege}
+        \Use {Boolean} {currently\_interested}
+    	\Events{WantUsingCriticalSection, EndUsingCriticalSection, ReceiveRequestMessage, ReceiveReplyMessage}
+	   \Need {}
     \end{algorithmic}
 \end{algorithm}
 \end{center}
 
-
 \end{frame}
 
 \begin{frame}
-\frametitle{Main Point 2}
-\framesubtitle{Explain the Significance of the Results}
-Pause, and explain the relationships between the formal theorems that you have just presented and the informal description that you gave in the Introduction. Make it clear to the audience that the results do live up to the advance publicity. If the statements of the theorems are very technical then this may take some time. It is time well-spent.
+\frametitle{Algorithm Pseudocode Part 2}
 
+\begin{center}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Ricart-Agrawala}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:ricart_agrawala}
+    \begin{algorithmic}[1]
+        \Event {WantUsingCriticalSection}{ }
+            \begin{enumerate}
+                \item currently\_interested ← true;
+                \item request\_timestamp ← timestamp();
+                \item send request message (request\_timestamp) into the all connected channels;
+            \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm Pseudocode Part 3}
+
+\begin{center}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Ricart-Agrawala}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:ricart_agrawala}
+    \begin{algorithmic}[1]
+        \Event {EndUsingCriticalSection}{ }
+            \begin{enumerate}
+                \item using\_critical\_section ← false;
+                \item currently\_interested ← false;
+                \item reply\_count ← 0;
+                \item if deferred\_channels is not empty then
+                \item \quad has\_privilege ← false;
+                \item \quad while deferred\_channels is not empty
+                \item \quad\quad pop from deferred\_channels into i;
+                \item \quad\quad send reply message (timestamp()) into the channel ⟨i⟩;
+                \item \quad end while
+                \item end if
+            \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm Pseudocode Part 4}
+
+\begin{center}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Ricart-Agrawala}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:ricart_agrawala}
+    \begin{algorithmic}[1]
+        \Event {ReceiveRequestMessage}{ }
+            \begin{enumerate}
+                \item message\_timestamp ← message.timestamp()
+                \item if using\_critical\_section = true then
+                \item \quad push i into deferred\_channels;
+                \item else then
+                \item \quad if currently\_interested = false or request\_timestamp > message\_timestamp then
+                \item \quad\quad send reply message (timestamp()) into the channel i;
+                \item \quad else then
+                \item \quad\quad push i into deferred\_channels;
+                \item \quad end if
+                \item end if
+            \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm Pseudocode Part 5}
+
+\begin{center}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Ricart-Agrawala}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:ricart_agrawala}
+    \begin{algorithmic}[1]
+        \Event {ReceiveReplyMessage}{ }
+            \begin{enumerate}
+                \item reply\_count ← reply\_count + 1;
+                \item if reply\_count = total\_channel\_number then
+                \item \quad has\_token ← true;
+                \item \quad using\_critical\_section ← true;
+                \item end if
+            \end{enumerate}
+
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Strength of The Algorithm}
+\framesubtitle{Correctness}
+\begin{itemize}
+    \item \textbf{Mutual Exclusion}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Strength of The Algorithm}
+\framesubtitle{Complexity}
+\begin{itemize}
+    \item \textbf{Message Complexity:} $2(N-1)$
+    \item \textbf{Synchronization Delay:} Maximum message transmission time
+\end{itemize}
 \end{frame}
 
 \subsection{Main Point 3}
