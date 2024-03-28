@@ -1,0 +1,72 @@
+I have to write a documentation about a mutual exclusion algorithm in distributed systems named as Ricart-Agrawala algorithm. I need a introduction section that may have 600-800 words. Use very clear language. Explain scientific terms and methodologies in detail. The audience may lack of knowledge. Try to give answers to questions below in your paragraphs.
+
+1. What is mutual exclusion, why we need, what does mutual exclusion concept try to solve?
+2. What are the drawbacks, how they occur?
+3. What are the naive solutions to the problem of mutual exclusion tries to solve?
+4. What are the drawbacks and weak points of these naive solutions?
+5. What does Ricart-Agrawala algorithm offer about the problem?
+6. Explain Ricart-Agrawala algorithm's steps.
+7. Explain possible drawbacks of Ricart-Agrawala algorithm.
+
+Here is the Ricart-Agrawala algorithm specifications in Wikipedia:
+
+Terminology[edit]
+A site is any computing device which runs the Ricart-Agrawala Algorithm
+The requesting site is the site which is requesting to enter the critical section.
+The receiving site is every other site which is receiving a request from the requesting site.
+Algorithm[edit]
+Requesting Site
+Sends a message to all sites. This message includes the site's name, and the current timestamp of the system according to its logical clock (which is assumed to be synchronized with the other sites)
+Receiving Site
+Upon reception of a request message, immediately sending a timestamped reply message if and only if:
+the receiving process is not currently interested in the critical section OR
+the receiving process has a lower priority (usually this means having a later timestamp)
+Otherwise, the receiving process will defer the reply message. This means that a reply will be sent only after the receiving process has finished using the critical section itself.
+Critical Section:
+Requesting site enters its critical section only after receiving all reply messages.
+Upon exiting the critical section, the site sends all deferred reply messages.
+Performance[edit]
+Max number of network messages: 
+2
+∗
+(
+N
+−
+1
+)
+{\displaystyle 2*(N-1)}
+Synchronization Delays: One message propagation delay
+Common optimizations[edit]
+Once site 
+P
+i
+{\displaystyle P_{i}} has received a 
+r
+e
+p
+l
+y
+{\displaystyle reply} message from site 
+P
+j
+{\displaystyle P_{j}}, site 
+P
+i
+{\displaystyle P_{i}} may enter the critical section multiple times without receiving permission from 
+P
+j
+{\displaystyle P_{j}} on subsequent attempts up to the moment when 
+P
+i
+{\displaystyle P_{i}} has sent a 
+r
+e
+p
+l
+y
+{\displaystyle reply} message to 
+P
+j
+{\displaystyle P_{j}}. This is called Roucairol-Carvalho optimization or Roucairol-Carvalho algorithm.
+Problems[edit]
+One of the problems in this algorithm is failure of a node. In such a situation a process may starve forever. This problem can be solved by detecting failure of nodes after some timeout.

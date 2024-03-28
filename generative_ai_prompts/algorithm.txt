@@ -1,0 +1,13 @@
+Paraphrase it, make it simple and one sentence.
+
+Message Complexity: Ricart–Agrawala algorithm requires invocation of 2(N – 1) messages per critical section execution. These 2(N – 1) messages involves
+
+(N – 1) request messages
+(N – 1) reply messages
+
+Paraphrase it, make it simple and create a paragraph, CS stands for critical section, clarify that proof is done by contradiction.
+
+Proof: Proof is by contradiction.
+ Suppose two sites Si and Sj ‘ are executing the CS concurrently and Si ’s request has higher priority than the request of Sj . Clearly, Si received Sj ’s request after it has made its own request.
+ Thus, Sj can concurrently execute the CS with Si only if Si returns a REPLY to Sj (in response to Sj ’s request) before Si exits the CS.
+ However, this is impossible because Sj ’s request has lower priority. Therefore, Ricart-Agrawala algorithm achieves mutual exclusion.

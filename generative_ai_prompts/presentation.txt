@@ -1,0 +1,29 @@
+explain me the advantages of ricart-agrawala algorithm by considering below paragraph, give your explanation as items, keep it simple, the audience may not have proper knowledge
+
+RICART–AGRAWALA ALGORITHM
+ Ricart–Agrawala algorithm is an algorithm to for mutual exclusion in a distributed system proposed by Glenn Ricart and Ashok Agrawala.
+ This algorithm is an extension and optimization of Lamport’s Distributed Mutual Exclusion Algorithm.
+ It follows permission based approach to ensure mutual exclusion.
+ Two type of messages ( REQUEST and REPLY) are used and communication
+channels are assumed to follow FIFO order.
+ A site send a REQUEST message to all other site to get their permission to enter
+critical section.
+ A site send a REPLY message to other site to give its permission to enter the critical
+section.
+ A timestamp is given to each critical section request using Lamport’s logical clock.
+ Timestamp is used to determine priority of critical section requests.
+ Smaller timestamp gets high priority over larger timestamp.
+ The execution of critical section request is always in the order of their timestamp.
+
+Message Complexity:
+Ricart–Agrawala algorithm requires invocation of 2(N – 1) messages per critical section execution. These 2(N – 1) messages involve:
+ (N – 1) request messages
+ (N – 1) reply messages
+Performance:
+Synchronization delay is equal to maximum message transmission time It requires 2(N – 1) messages per Critical section execution.
+
+The Ricart–Agrawala algorithm is an algorithm for mutual exclusion on a distributed system. This algorithm is an extension and optimization of Lamport's Distributed Mutual Exclusion Algorithm, by removing the need for 
+a
+c
+k
+{\displaystyle ack} messages.[1] It was developed by computer scientists Glenn Ricart and Ashok Agrawala.
