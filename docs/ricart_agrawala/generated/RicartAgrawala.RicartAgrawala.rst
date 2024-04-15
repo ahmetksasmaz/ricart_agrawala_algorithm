@@ -1,5 +1,5 @@
 ﻿RicartAgrawala.RicartAgrawala
-=================
+=============================
 
 .. automodule:: RicartAgrawala.RicartAgrawala
 
@@ -21,6 +21,9 @@
       :members:
       :undoc-members:
    .. autoclass:: RicartAgrawalaEventTypes
+      :members:
+      :undoc-members:
+   .. autoclass:: RicartAgrawalaMessagePayload
       :members:
       :undoc-members:
    .. autoclass:: RicartAgrawalaMessageTypes
