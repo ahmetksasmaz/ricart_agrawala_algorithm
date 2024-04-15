@@ -5,4 +5,4 @@ Code Documentation
    :toctree: generated
    :recursive:
 
-   .. RicartAgrawala.RicartAgrawala
+   RicartAgrawala.RicartAgrawala
