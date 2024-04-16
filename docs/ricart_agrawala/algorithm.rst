@@ -34,51 +34,93 @@ Distributed Algorithm: |DistAlgName|
         :linenos:
         :caption: Ricart-Agrawala Algorithm [RicartAgrawalaAlgorithm]_.
         
-        channel list deferred_channels, list of deferred channels
-        integer total_channel_number, total number of channels in topology
-        integer reply_count, number of replies received so far
+        integer self_id, self node id
+        request list deferred_requests, list of deferred requests
+        node set other_nodes, set of other nodes in the topology
+        node set nodes_replied, set of replied nodes for request
         bool using_critical_section, a boolean represents whether node is using critical section or not
         bool has_privilege, a boolean represents whether node has privilege to use critical section
-        timestamp request_timestamp, a timestamp for the moment of request for using critical section
-        bool currently_interested, a boolean represents whether node is interested in using critical section
+        bool want_privilege, a boolean represents whether self node currently wants privilege or not
+        integer request_clock, a logical clock stamp for the moment of request for using critical section
+        integer clock, a logical clock for node 
+
+        If p initializes
+            other_nodes ← topology_nodes / self_id
 
         If p wants to use critical section
-            currently_interested ← true;
-            request_timestamp ← timestamp();
-            send request message (request_timestamp) into the all connected channels;
+            if want_privilege = false then
+                if using_critical_section = false then
+                    if has_privilege = true then
+                        using_critical_section ← true;
+                    else then
+                        want_privilege ← true;
+                        request_clock ← clock;
+                        clock ← clock + 1;
+                        for node_id in other_nodes
+                            send request message including request_clock to node with node_id
+                        end for
+                    end if
 
         If p ends using critical section
             using_critical_section ← false;
-            currently_interested ← false;
-            reply_count ← 0;
-            if deferred_channels is not empty then
+            want_privilege ← false;
+            clear nodes_replied
+            if deferred_requests is not empty then
                 has_privilege ← false;
-                while deferred_channels is not empty
-                    pop from deferred_channels into ⟨i⟩;
-                    send reply message (timestamp()) into the channel ⟨i⟩;
+                while deferred_requests is not empty
+                    pop from deferred_requests into deferred_request;
+                    if clock <= deferred_request.clock then
+                        clock ← deferred_request.clock + 1
+                    end if
+                    send reply message to node with deferred_request.node_id;
                 end while
             end if
 
-        If p receives a reply message through a channel i
-            reply_count ← reply_count + 1;
-            if reply_count = total_channel_number then
-                has_token ← true;
+        If p receives a reply message from node i
+            push ⟨i⟩ into nodes_replied
+            if nodes_replied = other_nodes then
+                has_privilege ← true;
                 using_critical_section ← true;
             end if
         
-        If p receives a request message through a channel i
-            message_timestamp ← message.timestamp()
-            if using_critical_section = true then
-                push ⟨i⟩ into deferred_channels;
-            else then
-                if currently_interested = false or request_timestamp > message_timestamp then
-                    send reply message (timestamp()) into the channel ⟨i⟩;
+        If p receives a request message from node i
+            if using_critical_section = false then
+                if has_privilege = true then
+                    has_privilege ← false;
+                    if clock <= message.clock then
+                        clock ← message.clock + 1;
+                    end if
+                    send reply message to node with message.node_id;
                 else then
-                    push ⟨i⟩ into deferred_channels;
-                end if
+                    if want_privilege = true then
+                        if request_clock > message.clock then
+                            if clock <= request_clock then
+                                clock ← request_clock + 1;
+                            end if
+                            send reply message to node with message.node_id;
+                        else then
+                            push ⟨message⟩ into deferred_requests;
+                        end if
+                    else then
+                        if clock <= message.clock then
+                            clock ← message.clock + 1;
+                        end if
+                        send reply message to node with message.node_id;
+                    end if
+                endif
+            else then
+                push ⟨message⟩ into deferred_requests;
             end if
 
-Explanation of pseudocode lines will be added later.
+Lines[47-48] This function is called when init event is triggered. Other nodes are set except the self.
+
+Lines[50-62]  This function is called when self node wants privilege to use critical section. If the self node has already requested for privilege, nothing happens. If the self node is currently using critical section, nothing happens. Otherwise it is time to request for privilege. If we have the privilege (but not using), then we can use it.If we don't have the privilege, we should ask it.
+
+Lines[64-77] This function is called when self node is done with the critical section. We release the privilege, if there are some nodes that requests privilege in our queue, we forward the token to the first one. If still there are others waiting for the privilege, we request the token from our new parent.
+
+Lines[79-84] This function is called when self node receives reply message. We simply add the reply to replied nodes. If all other nodes has sent reply at the end, we start using critical section.
+
+Lines[86-113] This function is called when self node receives a request. If we have the privilege and currently using critical section we simply push the new one into deferred requests. If we have token but not using it, then we send reply. If we don't have token, we consider our urge to have privilege. If we want and requested before, other one's request is deferred. Otherwise the requester have priority.
 
 **Example**
 ~~~~~~~~

@@ -81,7 +81,7 @@ class RicartAgrawalaComponentModel(GenericModel):
     def on_init(self, event: Event):
         """
         This function is called when init event is triggered.
-        Total node number is set except the self.
+        Other nodes are set except the self.
         """
         self.other_nodes = self.topology.nodes.keys().remove(self.componentinstancenumber)
 
