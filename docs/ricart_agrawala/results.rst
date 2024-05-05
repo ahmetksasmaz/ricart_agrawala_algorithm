@@ -6,13 +6,56 @@ Implementation, Results and Discussion
 Implementation and Methodology
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Writing the methodology lies at the core of the paper, and fulfills one of the basic principles underlying the scientific method. Any scientific paper needs to be verifiable by other researchers, so that they can review the results by replicating the experiment and guaranteeing the validity. To assist this, you need to give a completely accurate description of the equipment and the techniques used for gathering the data [Shuttleworth2016]_.
+To deploy the algorithm, we utilized an event-driven node sourced from the adhoccomputing library. These nodes seamlessly manage events through an internal queue.
 
-Other scientists are not going to take your word for it, and they want to be able to evaluate whether your methodology is sound. In addition, it is useful for the reader to understand how you obtained your data, because it allows them to evaluate the quality of the results. For example, if you were trying to obtain data about shopping preferences, you will obtain different results from a multiple-choice questionnaire than from a series of open interviews. Writing methodology allows the reader to make their own decision about the validity of the data. If the research about shopping preferences were built upon a single case study, it would have little external validity, and the reader would treat the results with the contempt that they deserve [Shuttleworth2016]_.
+Communication among nodes occurs via channels, serving as direct links representing edges in the system's structure.
 
-Describe the materials and equipment used in the research. Explain how the samples were gathered, any randomization techniques and how the samples were prepared. Explain how the measurements were made and what calculations were performed upon the raw data. Describe the statistical techniques used upon the data [Shuttleworth2016]_.
+The algorithm encompasses four primary event types:
 
-Present any important details of your implementation here.
+1. Requesting privilege
+2. Releasing privilege
+3. Receiving request messages
+4. Receiving reply messages
+
+For comprehensive details and formal definitions, consult the documentation.
+
+To validate the algorithm, we initially construct an appropriate network topology. For the Ricart-Agrawala algorithm, a connected topology is required.
+
+Creating a connected topology involves specifying the number of nodes and the probability of edge connections between pairs of nodes.
+
+We systematically pair nodes and establish edges based on the provided probability. Subsequently, we verify connectivity among all components.
+
+To ensure complete connectivity, any disjoint components are linked by randomly selecting nodes from each and connecting them with an edge.
+
+Key Considerations:
+
+1. When the probability equals 1.0, the topology becomes fully connected.
+
+2. When the probability equals 0.0, although the topology is non-connected, our method ensures that all components remain connected, effectively resembling a linked list.
+
+Once the topology is established, all nodes are activated.
+
+Selected nodes are then prompted to request privilege at random intervals following a Poisson distribution.
+
+The testing process waits until no nodes are requesting privilege.
+
+Finally, data from all nodes is collected and analyzed to derive benchmark results, including:
+
+1. Total privilege requests
+2. Instances of duplicate privilege requests
+3. Total critical section usage
+4. Total critical section releases
+5. Count of received request messages
+6. Count of received reply messages
+7. Count of sent request messages
+8. Count of sent reply messages
+9. Total forwarded messages
+
+The relationship between total privilege requests and the sum of request and reply messages indicates message complexity.
+
+Moreover, the correlation between total privilege requests and total critical section releases provides practical evidence of fairness and absence of starvation.
+
+Additionally, it's notable that the number of edges inversely correlates with the total forwarded messages, highlighting an interesting aspect of the system's behavior.
 
 Results
 ~~~~~~~~

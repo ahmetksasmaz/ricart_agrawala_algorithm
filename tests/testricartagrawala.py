@@ -129,6 +129,7 @@ def main():
 
     # Collect and print data
     total_want_privilege = 0
+    total_duplicate_want_privilege = 0
     total_used_critical_section = 0
     total_released_critical_section = 0
     total_request_message_received = 0
@@ -138,6 +139,7 @@ def main():
     total_forwarded_message = 0
     for x in range(args["node"]):
         total_want_privilege += topology.nodes[x].total_want_privilege
+        total_duplicate_want_privilege += topology.nodes[x].total_duplicate_want_privilege
         total_used_critical_section += topology.nodes[x].total_used_critical_section
         total_released_critical_section += topology.nodes[x].total_released_critical_section
         total_request_message_received += topology.nodes[x].total_request_message_received
@@ -147,6 +149,7 @@ def main():
         total_forwarded_message += topology.nodes[x].total_forwarded_message
 
     print("total_want_privilege : ", total_want_privilege)
+    print("total_duplicate_want_privilege : ", total_duplicate_want_privilege)
     print("total_used_critical_section : ", total_used_critical_section)
     print("total_released_critical_section : ", total_released_critical_section)
     print("total_request_message_received : ", total_request_message_received)

@@ -71,6 +71,7 @@ class RicartAgrawalaComponentModel(GenericModel):
         # Metrics for experiments
         self.experiment_sleep_scaler = 1.0
         self.total_want_privilege = 0
+        self.total_duplicate_want_privilege = 0
         self.total_used_critical_section = 0
         self.total_released_critical_section = 0
         self.total_request_message_received = 0
@@ -133,6 +134,8 @@ class RicartAgrawalaComponentModel(GenericModel):
                     for node_id in self.other_nodes:
                         self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REQUEST, node_id, self.request_clock)))
                         self.total_request_message_sent += 1
+        else:
+            self.total_duplicate_want_privilege += 1
 
     def on_release_privilege(self, eventobj: Event):
         """

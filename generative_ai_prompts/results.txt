@@ -1,0 +1,54 @@
+parahprase this, and make it beautiful, simpler
+
+In order to implement the algorithm, an event based node from the library adhoccomputing was used. This event based node has internal event queue.
+
+And the messages between the nodes are published through channels. Channels are simply a projection of edges in the topology.
+
+In general, the algorithm has 4 different types of events:
+
+1. Want privilege
+2. Release privilege
+3. Get request message
+4. Get reply message
+
+Further details and declarations about the algorithm can be found in the documentation.
+
+To test the algorithm, firstly a proper topology is created. For Ricart-Agrawala algorithm, it is connected topology.
+
+In order to create connected topology, we need the number of nodes and probability of edge existence between node pairs.
+
+We iterate all pairs of nodes and create edge according the probability. Then check for the detached different connected components.
+
+In order to connect them, select random node from both of them and create an edge between them. Therefore ensure that all the topology is connected.
+
+Note:
+
+1. If the probability is equal to 1.0, the topology becomes fully connected.
+
+2. If the probability is equal to 0.0, the topology becomes non-connected. However, our topology creation method ensures that all the connected components (in this case, all nodes) is connected, so topology becomes a linked list.
+
+After creating the topology, all nodes are started.
+
+Then randomly selected nodes triggered for wanting privilege with time distributed according to Poisson distribution.
+
+Then, the tester waits all the nodes to be in a state of not wanting the privilege.
+
+Finally the information of all nodes are gathered and summed up to get the benchmark results.
+
+Results includes these:
+
+1. Total want privilege
+2. Total duplicate want privilege
+3. Total used critical section
+4. Total released critical section
+5. Total request message received
+6. Total reply message received
+7. Total request message sent
+8. Total reply message sent
+9. Total forwarded message
+
+The relation between total want privilege and sum of total request message and total reply message gives the message complexity.
+
+In addition, relation between total want privilege and total released critical section gives the practical proof of no starvation and fairness.
+
+At last, it can be seen that the number of edges inversely correlated with the total forwarded message.

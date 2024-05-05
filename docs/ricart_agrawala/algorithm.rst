@@ -125,7 +125,6 @@ Lines[86-113] This function is called when self node receives a request. If we h
 **Example**
 ~~~~~~~~
 
-Will be added later.
 
 **Correctness**
 ~~~~~~~~~~~
@@ -138,7 +137,7 @@ Will be added later.
 1. **Message Complexity:** The Ricart-Agrawala algorithm needs 2 times (N - 1) messages for each critical section execution, comprising (N - 1) request messages and (N - 1) reply messages.
 2. **Synchronization Delay:** Maximum message transmission time.
 
-.. [SuzukiKasamiAlgorithm] Gerard Tel, Introduction to Distributed Algorithms, CAMBRIDGE UNIVERSITY PRESS, 2001
-.. [RaymondsAlgorithm] Wan Fokkink, Distributed Algorithms An Intuitive Approach, The MIT Press Cambridge, Massachusetts London, England, 2013
-.. [RicartAgrawalaAlgorithm] Leslie Lamport, K. Mani Chandy: Distributed Snapshots: Determining Global States of a Distributed System. In: ACM Transactions on Computer Systems 3. Nr. 1, Februar 1985.
-.. [MaekawasAlgorithm] Leslie Lamport, K. Mani Chandy: Distributed Snapshots: Determining Global States of a Distributed System. In: ACM Transactions on Computer Systems 3. Nr. 1, Februar 1985.
+.. [SuzukiKasamiAlgorithm] Suzuki, I., & Kasami, T. (1985). A distributed mutual exclusion algorithm. ACM Transactions on Computer Systems (TOCS), 3(4), 344-349.
+.. [RaymondsAlgorithm] Raymond, K. (1989). A tree-based algorithm for distributed mutual exclusion. ACM Transactions on Computer Systems (TOCS), 7(1), 61-77.
+.. [RicartAgrawalaAlgorithm] Ricart, G., & Agrawala, A. K. (1981). An optimal algorithm for mutual exclusion in computer networks. Communications of the ACM, 24(1), 9-17.
+.. [MaekawasAlgorithm] Maekawa, M. (1985). A sqrt(N) algorithm for mutual exclusion in decentralized systems. ACM Transactions on Computer Systems (TOCS), 3(2), 145-159.
