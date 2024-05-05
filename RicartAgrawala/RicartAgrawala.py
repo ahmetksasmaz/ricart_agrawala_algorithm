@@ -7,6 +7,7 @@ This module implements Ricart-Agrawala Algorithm
 from enum import Enum
 from time import sleep
 import random
+import networkx as nx
 
 from adhoccomputing.Experimentation.Topology import Topology
 from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
@@ -78,35 +79,39 @@ class RicartAgrawalaComponentModel(GenericModel):
         self.total_reply_message_sent = 0
         self.total_forwarded_message = 0
 
-    def on_init(self, event: Event):
+    def on_init(self, eventobj: Event):
         """
         This function is called when init event is triggered.
         Other nodes are set except the self.
         """
-        self.other_nodes = self.topology.nodes.keys().remove(self.componentinstancenumber)
+        self.other_nodes = set(self.topology.nodes)
+        self.other_nodes.remove(self.componentinstancenumber)
 
-    def on_message_from_bottom(self, event: Event):
+    def on_message_from_bottom(self, eventobj: Event):
         """
         This function is called when message is received from bottom.
         Then proper Ricart Agrawala Event is triggered according to message type.
         In case of not fully connected topology, we forward others' messages. 
         """
-        header = event.eventcontent.header
+        header = eventobj.eventcontent.header
         if header.messageto == self.componentinstancenumber:
             if header.messagetype == RicartAgrawalaMessageTypes.REQUEST:
-                event.event = RicartAgrawalaEventTypes.GET_REQUEST
+                eventobj.event = RicartAgrawalaEventTypes.GET_REQUEST
             elif header.messagetype == RicartAgrawalaMessageTypes.REPLY:
-                event.event = RicartAgrawalaEventTypes.GET_REPLY
-            self.send_self(event)
+                eventobj.event = RicartAgrawalaEventTypes.GET_REPLY
+            self.send_self(eventobj)
         else:
-            next_hop = self.topology.get_next_hop(self.componentinstancenumber, header.messageto)
-            interface_id = f"{self.componentinstancenumber}-{next_hop}"
-            self.total_forwarded_message += 1
-            header.nexthop = next_hop
-            header.interfaceid = interface_id
-            self.send_down(Event(self, EventTypes.MFRT, event.eventcontent))
+            # Check are we in the shortest route?
+            if self.componentinstancenumber == header.nexthop:
+                next_hop = self.topology.get_next_hop(self.componentinstancenumber, header.messageto)
+                interface_id = f"{self.componentinstancenumber}-{next_hop}"
+                self.total_forwarded_message += 1
+                header.nexthop = next_hop
+                header.interfaceid = interface_id
+                eventobj.eventcontent.header = header
+                self.send_down(Event(self, EventTypes.MFRT, eventobj.eventcontent))
 
-    def on_want_privilege(self, event: Event):
+    def on_want_privilege(self, eventobj: Event):
         """
         This function is called when self node wants privilege to use critical section.
         If the self node has already requested for privilege, nothing happens.
@@ -129,7 +134,7 @@ class RicartAgrawalaComponentModel(GenericModel):
                         self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REQUEST, node_id, self.request_clock)))
                         self.total_request_message_sent += 1
 
-    def on_release_privilege(self, event: Event):
+    def on_release_privilege(self, eventobj: Event):
         """
         This function is called when self node is done with the critical section.
         We release the privilege, if there are some nodes that requests privilege in our queue,
@@ -149,51 +154,55 @@ class RicartAgrawalaComponentModel(GenericModel):
                 self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REPLY, element.node_id)))
                 self.total_reply_message_sent += 1
 
-    def on_get_request(self, event: Event):
+    def on_get_request(self, eventobj: Event):
         """
         This function is called when self node receives a request. If we have the privilege and currently using critical section
         we simply push the new one into deferred requests. If we have token but not using it, then we send reply.
         If we don't have token, we consider our urge to have privilege. If we want and requested before, other one's request is deferred. Otherwise the requester have priority.
         """
         self.total_request_message_received += 1
-        node_id = event.eventcontent.payload.node_id
-        request_clock = event.eventcontent.payload.clock
+        node_id = eventobj.eventcontent.payload.node_id
+        request_clock = eventobj.eventcontent.payload.clock
         if self.using_critical_section == False: # If we are not using the token
             if self.has_privilege == True: # If we have the token then give it
                 self.has_privilege = False
                 if self.clock <= request_clock:
                     self.clock = request_clock + 1
                 self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REPLY, node_id)))
-                self.total_token_message_sent += 1
+                self.total_reply_message_sent += 1
             else: # We don't have the token
                 if self.want_privilege == True: # If also we want the privilege
-                    if self.request_clock > request_clock: # We wanted later, so we will give
+                    if self.request_clock >= request_clock: # We wanted later, so we will give
                         if self.clock <= request_clock:
                             self.clock = request_clock + 1
                         self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REPLY, node_id)))
-                        self.total_token_message_sent += 1
+                        self.total_reply_message_sent += 1
                     else: # We wanted before, so the requester must wait
-                        self.deferred_requests.append(event.eventcontent.payload)
+                        self.deferred_requests.append(eventobj.eventcontent.payload)
                 else: # We don't want privilege, so the requester may have it
                     if self.clock <= request_clock:
                         self.clock = request_clock + 1
                     self.send_down(Event(self, EventTypes.MFRT, self.create_message(RicartAgrawalaMessageTypes.REPLY, node_id)))
-                    self.total_token_message_sent += 1
+                    self.total_reply_message_sent += 1
         else: # If we have the token and using critical section
-            self.deferred_requests.append(event.eventcontent.payload)
+            self.deferred_requests.append(eventobj.eventcontent.payload)
     
-    def on_get_reply(self, event:Event):
+    def on_get_reply(self, eventobj:Event):
         """
         This function is called when self node receives reply message.
         We simply add the reply to replied nodes. If all other nodes has sent reply at the end, we start using critical section.
         """
         self.total_reply_message_received += 1
-        node_id = event.eventcontent.payload.node_id
+        node_id = eventobj.eventcontent.payload.node_id
         self.nodes_replied.add(node_id)
         if self.nodes_replied == self.other_nodes:
             self.has_privilege = True
             self.using_critical_section = True
             self.use_critical_section()
+
+    # External trigger functions
+    def trigger_privilege(self):
+        self.send_self(Event(self, RicartAgrawalaEventTypes.WANT_PRIVILEGE, None)) # Trigger want privilege
 
     # Helper functions
     def create_message(self, message_type, node_id, request_clock = None):
