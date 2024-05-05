@@ -1,3 +1,9 @@
+"""
+Distributed Computing Systems Mutual Exclusion Algorithms
+
+This module implements tester for Ricart-Agrawala Algorithm
+"""
+
 # AHC Library
 from adhoccomputing.GenericModel import GenericModel
 from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes
@@ -23,9 +29,19 @@ from RicartAgrawala.RicartAgrawala import RicartAgrawalaComponentModel
 
 # Poisson event generator
 def next_poisson_event(rate_parameter):
+    """
+    This helper function is for creating an event at particular timestamp that is distributed with respect to Poisson distribution.
+    """
     return -math.log(1.0 - random.random()) / rate_parameter
 
 def create_connected_topology(n, edge):
+    """
+    Ricart-Agrawala Algorithm works on a connected topology.
+    It takes node count, and edge probability for every node pair.
+    If edge probability is 1.0, then the graph is fully connected.
+    If edge probability is 0.0 (prevented by an if check in main), then the graph is disconnected.
+    Finally it connects random nodes from different connected components so that all of the nodes has a path between them.
+    """
     G = nx.empty_graph(n)    
     # Create edge with probability
     i = 0
@@ -50,6 +66,20 @@ def create_connected_topology(n, edge):
 topology = Topology()
 
 def main():
+    """
+    This is the main function for testing.
+    It parses parameters from command line. The parameters are:
+    -n --node: Total number of nodes in the test
+    -e --edge: Probability of existing of edge between nodes (0.0, 1.0] - (fully seperated, fully connected] (ensuring at least one edge for a node)
+    -p --privilege: Number of privilege request for random node in a test
+    -r --rate: Poisson rate to generate privilege trigger for random node
+    -s --scale: Using critical section time scale, multiplied by a random integer between [1,3]
+
+    It creates and starts the topology.
+    It creates an privilege request event in time w.r.t. Poisson distribution.
+    Then, it waits for all nodes to stop wanting the privilege.
+    Finally prints the result.
+    """
     parser = argparse.ArgumentParser(description='Raymond\'s Algorithm Tester')
     parser.add_argument('-n','--node', help='Total number of nodes in the test', required=True, type=int)
     parser.add_argument('-e','--edge', help='Probability of existing of edge between nodes (0.0, 1.0] - (fully seperated, fully connected] (ensuring at least one edge for a node)', required=True, type=float)

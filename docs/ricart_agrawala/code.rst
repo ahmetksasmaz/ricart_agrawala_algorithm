@@ -6,3 +6,4 @@ Code Documentation
    :recursive:
 
    RicartAgrawala.RicartAgrawala
+   tests.testricartagrawala

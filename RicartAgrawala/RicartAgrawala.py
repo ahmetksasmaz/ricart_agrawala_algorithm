@@ -202,6 +202,9 @@ class RicartAgrawalaComponentModel(GenericModel):
 
     # External trigger functions
     def trigger_privilege(self):
+        """
+        This function is used for external triggering when testing
+        """
         self.send_self(Event(self, RicartAgrawalaEventTypes.WANT_PRIVILEGE, None)) # Trigger want privilege
 
     # Helper functions
