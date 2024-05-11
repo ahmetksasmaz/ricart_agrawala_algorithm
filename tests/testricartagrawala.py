@@ -6,7 +6,7 @@ This module implements tester for Ricart-Agrawala Algorithm
 
 # AHC Library
 from adhoccomputing.GenericModel import GenericModel
-from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes
+from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes, setAHCLogLevel
 from adhoccomputing.Experimentation.Topology import Topology
 from adhoccomputing.Networking.LinkLayer.GenericLinkLayer import GenericLinkLayer
 from adhoccomputing.Networking.LogicalChannels.GenericChannel import GenericChannel
@@ -63,6 +63,8 @@ def create_connected_topology(n, edge):
 
     return G
 
+setAHCLogLevel(61) # Crucial for tqdm printing
+
 topology = Topology()
 
 def main():
@@ -86,10 +88,14 @@ def main():
     parser.add_argument('-p','--privilege', help='Number of privilege request for random node in a test', required=True, type=int)
     parser.add_argument('-r','--rate', help='Poisson rate to generate privilege trigger for random node', required=True, type=int)
     parser.add_argument('-s','--scale', help='Using critical section time scale', required=True, type=float)
+    parser.add_argument('-v','--verbose', help='Verbose mode', action="store_true")
     args = vars(parser.parse_args())
 
+    verbose = args["verbose"]
+
     if args["edge"] > 1.0 or args["edge"] <= 0.0:
-        print("Probability of existing of edge must be in (0.0, 1.0]")
+        if verbose == True:
+            print("Probability of existing of edge must be in (0.0, 1.0]")
         return 
 
     G = create_connected_topology(args["node"], args["edge"])
@@ -104,26 +110,26 @@ def main():
     for x in range(args["privilege"]):
         time.sleep(next_poisson_event(args["rate"]))
         random_node = random.randint(0, args["node"]-1)
-        print("Node[",random_node,"] triggered for privilege.")
+        # print("Node[",random_node,"] triggered for privilege.")
         topology.nodes[random_node].trigger_privilege()
 
     still_working = True
     while still_working:
         time.sleep(1)
         still_working = False
-        print("####################")
+        # print("####################")
         for x in range(args["node"]):
             if topology.nodes[x].want_privilege == True:
                 still_working = True
-                print("# Node[",x,"] : ",
-                topology.nodes[x].clock, " - ",
-                topology.nodes[x].request_clock, " - ",
-                # topology.nodes[x].deferred_requests, " - ",
-                set(list(range(args["node"]))).difference(topology.nodes[x].nodes_replied), " - ",
-                topology.nodes[x].using_critical_section, " - ",
-                topology.nodes[x].has_privilege, " - ",
-                topology.nodes[x].want_privilege)
-                # break
+                # print("# Node[",x,"] : ",
+                # topology.nodes[x].clock, " - ",
+                # topology.nodes[x].request_clock, " - ",
+                # # topology.nodes[x].deferred_requests, " - ",
+                # set(list(range(args["node"]))).difference(topology.nodes[x].nodes_replied), " - ",
+                # topology.nodes[x].using_critical_section, " - ",
+                # topology.nodes[x].has_privilege, " - ",
+                # topology.nodes[x].want_privilege)
+                break
     
     topology.exit()
 
@@ -148,15 +154,20 @@ def main():
         total_reply_message_sent += topology.nodes[x].total_reply_message_sent
         total_forwarded_message += topology.nodes[x].total_forwarded_message
 
-    print("total_want_privilege : ", total_want_privilege)
-    print("total_duplicate_want_privilege : ", total_duplicate_want_privilege)
-    print("total_used_critical_section : ", total_used_critical_section)
-    print("total_released_critical_section : ", total_released_critical_section)
-    print("total_request_message_received : ", total_request_message_received)
-    print("total_reply_message_received : ", total_reply_message_received)
-    print("total_request_message_sent : ", total_request_message_sent)
-    print("total_reply_message_sent : ", total_reply_message_sent)
-    print("total_forwarded_message : ", total_forwarded_message)
+    benchmark_results_file = open("benchmark_results.csv", "a+")
+
+    benchmark_results_file.write(str(args["node"]) + ",")
+    benchmark_results_file.write(str(args["edge"]) + ",")
+    benchmark_results_file.write(str(args["privilege"]) + ",")
+    benchmark_results_file.write(str(total_want_privilege) + ",")
+    benchmark_results_file.write(str(total_duplicate_want_privilege) + ",")
+    benchmark_results_file.write(str(total_used_critical_section) + ",")
+    benchmark_results_file.write(str(total_released_critical_section) + ",")
+    benchmark_results_file.write(str(total_request_message_received) + ",")
+    benchmark_results_file.write(str(total_reply_message_received) + ",")
+    benchmark_results_file.write(str(total_request_message_sent) + ",")
+    benchmark_results_file.write(str(total_reply_message_sent) + ",")
+    benchmark_results_file.write(str(total_forwarded_message) + "\n")
 
 if __name__ == "__main__":
     main()
