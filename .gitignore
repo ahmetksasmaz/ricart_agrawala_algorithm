@@ -137,3 +137,6 @@ dmypy.json
 .vscode
 
 _build/
+
+tests/*.png
+tests/*.csv
