@@ -197,14 +197,16 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
     \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
     	\Implement {\algorithmlabel}{cf} 
-    	\Use {List of Channels} {deferred\_channels} 
-    	\Use {Integer} {total\_channel\_number} 
-    	\Use {Integer} {reply\_count} 
-    	\Use {Timestamp} {request\_timestamp}
+        \Use {Integer} {self\_id}
+    	\Use {List of Requests} {deferred\_requests} 
+    	\Use {Set of Nodes} {other\_nodes} 
+    	\Use {Set of Nodes} {nodes\_replied} 
+    	\Use {Logical Clock} {request\_clock}
+    	\Use {Logical Clock} {clock}
     	\Use {Boolean} {using\_critical\_section}
         \Use {Boolean} {has\_privilege}
-        \Use {Boolean} {currently\_interested}
-    	\Events{WantUsingCriticalSection, EndUsingCriticalSection, ReceiveRequestMessage, ReceiveReplyMessage}
+        \Use {Boolean} {want\_privilege}
+    	\Events{Init, WantUsingCriticalSection, EndUsingCriticalSection, ReceiveRequestMessage, ReceiveReplyMessage}
 	   \Need {}
     \end{algorithmic}
 \end{algorithm}
@@ -222,11 +224,9 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
     \caption{\algorithmlabel\ algorithm}
     \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
-        \Event {WantUsingCriticalSection}{ }
+        \Event {Init}{ }
             \begin{enumerate}
-                \item currently\_interested ← true;
-                \item request\_timestamp ← timestamp();
-                \item send request message (request\_timestamp) into the all connected channels;
+                \item other\_nodes ← topology\_nodes / self\_id
             \end{enumerate}
     \end{algorithmic}
 \end{algorithm}
@@ -243,18 +243,20 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
     \caption{\algorithmlabel\ algorithm}
     \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
-        \Event {EndUsingCriticalSection}{ }
+        \Event {WantUsingCriticalSection}{ }
             \begin{enumerate}
-                \item using\_critical\_section ← false;
-                \item currently\_interested ← false;
-                \item reply\_count ← 0;
-                \item if deferred\_channels is not empty then
-                \item \quad has\_privilege ← false;
-                \item \quad while deferred\_channels is not empty
-                \item \quad\quad pop from deferred\_channels into i;
-                \item \quad\quad send reply message (timestamp()) into the channel ⟨i⟩;
-                \item \quad end while
-                \item end if
+                \item if want\_privilege = false then
+                \item \quad if using\_critical\_section = false then
+                \item \quad \quad if has\_privilege = true then
+                \item \quad \quad \quad using\_critical\_section ← true;
+                \item \quad \quad else then
+                \item \quad \quad \quad want\_privilege ← true;
+                \item \quad \quad \quad request\_clock ← clock;
+                \item \quad \quad \quad clock ← clock + 1;
+                \item \quad \quad \quad for node\_id in other\_nodes
+                \item \quad \quad \quad send request message including request\_clock to node with node\_id
+                \item \quad \quad end for
+                \item \quad end if
             \end{enumerate}
     \end{algorithmic}
 \end{algorithm}
@@ -271,17 +273,20 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
     \caption{\algorithmlabel\ algorithm}
     \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
-        \Event {ReceiveRequestMessage}{ }
+        \Event {EndUsingCriticalSection}{ }
             \begin{enumerate}
-                \item message\_timestamp ← message.timestamp()
-                \item if using\_critical\_section = true then
-                \item \quad push i into deferred\_channels;
-                \item else then
-                \item \quad if currently\_interested = false or request\_timestamp > message\_timestamp then
-                \item \quad\quad send reply message (timestamp()) into the channel i;
-                \item \quad else then
-                \item \quad\quad push i into deferred\_channels;
-                \item \quad end if
+                \item using\_critical\_section ← false;
+                \item want\_privilege ← false;
+                \item clear nodes\_replied
+                \item if deferred\_requests is not empty then
+                \item \quad has\_privilege ← false;
+                \item \quad while deferred\_requests is not empty
+                \item \quad \quad pop from deferred\_requests into deferred\_request;
+                \item \quad \quad if clock <= deferred\_request.clock then
+                \item \quad \quad \quad clock ← deferred\_request.clock + 1
+                \item \quad \quad end if
+                \item \quad \quad send reply message to node with deferred\_request.node\_id;
+                \item \quad end while
                 \item end if
             \end{enumerate}
     \end{algorithmic}
@@ -299,11 +304,56 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
     \caption{\algorithmlabel\ algorithm}
     \label{alg:ricart_agrawala}
     \begin{algorithmic}[1]
+        \Event {ReceiveRequestMessage}{ }
+            \begin{enumerate}
+                \item if using\_critical\_section = false then
+                \item \quad if has\_privilege = true then
+                \item \quad \quad has\_privilege ← false;
+                \item \quad \quad if clock <= message.clock then
+                \item \quad \quad \quad clock ← message.clock + 1;
+                \item \quad \quad end if
+                \item \quad \quad send reply message to node with message.node\_id;
+                \item \quad else then
+                \item \quad \quad if want\_privilege = true then
+                \item \quad \quad \quad if request\_clock > message.clock then
+                \item \quad \quad \quad \quad if clock <= request\_clock then
+                \item \quad \quad \quad \quad \quad clock ← request\_clock + 1;
+                \item \quad \quad \quad \quad end if
+                \item \quad \quad \quad send reply message to node with message.node\_id;
+                \item \quad \quad \quad else then
+                \item \quad \quad \quad \quad push $<$message$>$ into deferred\_requests;
+                \item \quad \quad \quad end if
+                \item \quad \quad else then
+                \item \quad \quad \quad if clock <= message.clock then
+                \item \quad \quad \quad \quad clock ← message.clock + 1;
+                \item \quad \quad \quad end if
+                \item \quad \quad \quad send reply message to node with message.node\_id;
+                \item \quad \quad end if
+                \item \quad endif
+                \item else then
+                \item \quad push $<$message$>$ into deferred\_requests;
+                \item end if
+            \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm Pseudocode Part 6}
+
+\begin{center}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Ricart-Agrawala}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:ricart_agrawala}
+    \begin{algorithmic}[1]
         \Event {ReceiveReplyMessage}{ }
             \begin{enumerate}
-                \item reply\_count ← reply\_count + 1;
-                \item if reply\_count = total\_channel\_number then
-                \item \quad has\_token ← true;
+                \item push $<$i$>$ into nodes\_replied
+                \item if nodes\_replied = other\_nodes then
+                \item \quad has\_privilege ← true;
                 \item \quad using\_critical\_section ← true;
                 \item end if
             \end{enumerate}
@@ -326,105 +376,48 @@ Ricart-Argawala Algorithm is based on fully connected topology. Every node has t
 \framesubtitle{Complexity}
 \begin{itemize}
     \item \textbf{Message Complexity:} $2(N-1)$
-    \item \textbf{Synchronization Delay:} Maximum message transmission time
+    \item \textbf{Memory Complexity:} $N-1$
 \end{itemize}
 \end{frame}
-
-\subsection{Main Point 3}
-\begin{frame}
-\frametitle{Main Point 3}
-\framesubtitle{Sketch a Proof of the Crucial Results}
-The emphasis is on the word ``sketch''. Give a very high-level description of the proofs, emphasizing the proof structure and the proof techniques used. If the proofs have no structure (in which case it may be assumed that you are not the author of the paper), then you must impose one on them. Gloss over the technical details. It is a good idea to point them out but not to explore them.
-\end{frame}
-
 
 \section{Experimental results/Proofs}
 
-\subsection{Main Result 1}
+\subsection{Message Complexity - Node Count \& Edge Probability}
 \begin{frame}
-\frametitle{Main Result 1}
+\frametitle{Message Complexity - Node Count \& Edge Probability}
 \framesubtitle{}
-Choose \textbf{just the key results}. They should be important, non-trivial, should give the flavour of the rest of the technical details and should be presentable in a relatively short period of time. Use figures instead of tables instead of text.
-
-Better to present 10\% the entire audience gets than 90\% nobody gets
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{figures/RicartAgrawalaAlgorithmMessageComplexity.png}
+    \caption{Ricart Agrawala Algorithm Message Complexity}
+    \label{fig:ricart_agrawala_algoritm_message_complexity}
+\end{figure}
 \end{frame}
 
-
-\subsection{Main Result 2}
+\subsection{Forwarded Message Complexity - Node Count \& Edge Probability}
 \begin{frame}
-\frametitle{Main Result 2}
-\framesubtitle{Try a subtitle}
-\begin{itemize}
-\item Make sure your notation is clear and consistent throughout the talk. Prepare a slide that explains the notation in detail, in case that is needed or if somebody asks.
-\item Always label all of your axes on graphs; use short but helpful captions on figures and tables. It is also very useful to have an arrow on the side which clearly shows which direction is considered better (e.g., "up is better").
-\item If you have experimental results, make sure you clearly present the experimental paradigm you used, and the details of your methods, including the number of trials, the specific analysis tools you applied, significance testing, etc.
-\item The talk should contain at least a brief discussion of the limitations and weaknesses of the presented approach or results, in addition to their strengths. This, however, should be done in an objective manner -- don't enthusiastically put down your own work.
-\end{itemize}
-\end{frame}
-
-
-\subsection{Main Result 3}
-\begin{frame}
-\frametitle{Main Result 3}
+\frametitle{Forwarded Message Complexity - Node Count \& Edge Probability}
 \framesubtitle{}
-\begin{itemize}
-\item If time allows, the results should be compared to the most related work in the field. You should at least prepare one slide with a summary of the related work, even if you do not get a chance to discuss it. This will be helpful if someone asks about it, and will demonstrate your mastery of the material.
-\item Spell check again.
-\item Give for each of the x-axis, y-axis, and z-axis
-\item Label, unit, scale (if log scale)
-\item Give the legend
-\item Explain all symbols
-\item Take an example to illustrate a specific point in the figure
-\end{itemize}
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{figures/RicartAgrawalaAlgorithmForwardedMessageComplexity.png}
+    \caption{Ricart Agrawala Algorithm Forwarded Message Complexity}
+    \label{fig:ricart_agrawala_algoritm_forwarded_message_complexity}
+\end{figure}
 \end{frame}
-
-
 
 \section{Conclusions}
 \begin{frame}
 \frametitle{Conclusions}
-\framesubtitle{Hindsight is Clearer than Foresight}
-Advices come from \cite{spillman2000present}.
+\framesubtitle{}
 \begin{itemize}
-\item You can now make observations that would have been confusing if they were introduced earlier. Use this opportunity to refer to statements that you have made in the previous three sections and weave them into a coherent synopsis. You will regain the attention of the non- experts, who probably didn’t follow all of the Technicalities section. Leave them feeling that they have learned something nonetheless.
-\item Give Open Problems It is traditional to end with a list of open problems that arise from your paper. Mention weaknesses of your paper, possible generalizations, and indications of whether they will be fruitful or not. This way you may defuse antagonistic questions during question time.
-\item Indicate that your Talk is Over
-An acceptable way to do this is to say “Thank-you. Are there any questions?”\cite{einstein}
+    \item Message Complexity
+    \item Memory Complexity
+    \item Node Failure
 \end{itemize}
 
 \end{frame}
-
-\section*{References}
-\begin{frame}{References}
-\tiny
-\bibliographystyle{IEEEtran}
-\bibliography{refs}
-\end{frame}
-
-\begin{frame}{How to prepare the talk?}
-Please read \url{http://larc.unt.edu/ian/pubs/speaker.pdf}
-\begin{itemize}
-\item The Introduction:  Define the Problem,    Motivate the Audience,    Introduce Terminology,    Discuss Earlier Work,    Emphasize the Contributions of your Paper,    Provide a Road-map.
-\item The Body:    Abstract the Major Results, Explain the Significance of the Results, Sketch a Proof of the Crucial Results
-\item Technicalities: Present a Key Lemma, Present it Carefully
-\item The Conclusion: Hindsight is Clearer than Foresight, Give Open Problems, Indicate that your Talk is Over
-\end{itemize}
-
-\note{
-\begin{itemize}
-\item The Introduction:  Define the Problem,    Motivate the Audience,    Introduce Terminology,    Discuss Earlier Work,    Emphasize the Contributions of your Paper,    Provide a Road-map.
-\item The Body:    Abstract the Major Results, Explain the Significance of the Results, Sketch a Proof of the Crucial Results
-\item Technicalities: Present a Key Lemma, Present it Carefully
-\item The Conclusion: Hindsight is Clearer than Foresight, Give Open Problems, Indicate that your Talk is Over 
-\end{itemize}
-}
-\end{frame}
-
-
 
 \thankslide
-
-
-
 
 \end{document}
