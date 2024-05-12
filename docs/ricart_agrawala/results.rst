@@ -60,37 +60,21 @@ Additionally, it's notable that the number of edges inversely correlates with th
 Results
 ~~~~~~~~
 
-Present your AHCv2 run results, plot figures.
+Based on its structure, the algorithm sends request messages to all other nodes when a node initiates a privilege request and awaits their responses. Thus, regardless of the scenario, 2*(N-1) messages are expected for a privilege request. Additionally, depending on the connectivity of the topology, messages may need to be delivered to specific nodes. If all nodes are interconnected, with an edge probability of 1.0, no messages are expected to be forwarded. In the case of a linear topology, the worst-case scenario involves forwarding a total of 2*(N-1)(N-2) messages for requests and replies, respectively, totaling 2(N-1)*(N-2) messages.
 
+.. image:: figures/RicartAgrawalaAlgorithmMessageComplexity.png
+  :width: 600
+  :alt: Ricart Agrawala Algorithm Message Complexity Graph
 
-This is probably the most variable part of any research paper, and depends upon the results and aims of the experiment. For quantitative research, it is a presentation of the numerical results and data, whereas for qualitative research it should be a broader discussion of trends, without going into too much detail. For research generating a lot of results, then it is better to include tables or graphs of the analyzed data and leave the raw data in the appendix, so that a researcher can follow up and check your calculations. A commentary is essential to linking the results together, rather than displaying isolated and unconnected charts, figures and findings. It can be quite difficulty to find a good balance between the results and the discussion section, because some findings, especially in a quantitative or descriptive experiment, will fall into a grey area. As long as you not repeat yourself to often, then there should be no major problem. It is best to try to find a middle course, where you give a general overview of the data and then expand upon it in the discussion - you should try to keep your own opinions and interpretations out of the results section, saving that for the discussion [Shuttleworth2016]_.
+The figure above illustrates the total number of messages generated per privilege request concerning the number of nodes and edge probability in the topology. Notably, regardless of the edge probability, the total generated messages remain constant at 2*(N-1).
 
+.. image:: figures/RicartAgrawalaAlgorithmForwardedMessageComplexity.png
+  :width: 600
+  :alt: Ricart Agrawala Algorithm Forwarded Message Complexity Graph
 
-.. image:: figures/CDFInterferecePowerFromKthNode2.png
-  :width: 400
-  :alt: Impact of interference power
-
-
-.. list-table:: Title
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - Heading row 1, column 1
-     - Heading row 1, column 2
-     - Heading row 1, column 3
-   * - Row 1, column 1
-     -
-     - Row 1, column 3
-   * - Row 2, column 1
-     - Row 2, column 2
-     - Row 2, column 3
+Similarly, the figure demonstrates the total number of messages forwarded per privilege request concerning the number of nodes and edge probability in the topology. As the edge probability approaches 1.0, the number of forwarded messages tends toward 0. Conversely, decreasing edge probability results in an increase in forwarded messages.
 
 Discussion
 ~~~~~~~~~~
 
-Present and discuss main learning points.
-
-
-
-
-.. [Shuttleworth2016] M. Shuttleworth. (2016) Writing methodology. `Online <https://explorable.com/writing-methodology>`_.
+In the event of a node failure in the topology, utilizing system failure detection algorithms allows the failing node to resume operation without affecting others. However, for efficient utilization of this algorithm, establishing a high number of connections between nodes is necessary, which could be costly in terms of hardware resources.

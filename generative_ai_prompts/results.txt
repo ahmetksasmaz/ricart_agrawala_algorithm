@@ -52,3 +52,25 @@ The relation between total want privilege and sum of total request message and t
 In addition, relation between total want privilege and total released critical section gives the practical proof of no starvation and fairness.
 
 At last, it can be seen that the number of edges inversely correlated with the total forwarded message.
+
+bu yarı ingilizce yarı türkçe metni, akademik ingilizce haline çevir ve basitleştir
+
+
+Algoritmanın kendi yapısından yola çıkarak, bir node privilege isteği gönderdiğinde diğer bütün node lara request mesajı gönderir ve onlardan bir yanıt bekler. Yani durum ne olursa olsun bir privilege isteği için 2*(N-1) adet mesaj üretilmesi beklenmektedir. Bunun yanında topolojinin bağlantı oranına bağlı olarak, mesajların ilgili nodelara iletilmesi gerekebilir. Eğer bütün node lar birbirine bağlı ise, yani edge probability 1.0 ise hiçbir mesajın forward edilmemesi beklenmektedir. Eğer ki topoloji lineer bir yapıya sahipse, en kötü ihtimalde request için (N-1)*(N-2) ve reply için de (N-1)*(N-2) olacak şekilde toplam 2*(N-1)*(N-2) mesajın forward edilmesi beklenir.
+
+Yukarıda gördüğünüz figürde topolojideki node sayısına ve edge probability ye karşılık bir privilege isteği başına toplamda ne kadar mesaj üretildiği gösterilmektedir. Görüleceği üzere edge probability den bağımsız olarak üretilen toplam mesaj 2*(N-1) şeklindedir.
+
+Yukarıda gördüğünüz figürde ise topolojideki node sayısına ve edge probability ye karşılık bir privilege isteği başına toplamda ne kadar mesaj forward edildiği gösterilmektedir. Görüleceği üzere edge probability 1.0 a yaklaştıkça forward edilen mesaj sayısı 0 a yakınsamaktadır. Diğer taraftan ise edge probability azaldıkça, forward edilen mesajın arttığı gözlenmektedir.
+
+Topolojideki herhangi bir node fail ettiğinde, fail eden node başkalarını etkilemeyecek şekilde sistem failure detection algoritmaları kullanarak tekrar sağlıklı bir şekilde çalışmaya devam edebilir. Fakat bu algoritmanın verimli bir şekilde kullanılabilmesi için node lar arasında yüksek sayıda bağlantı kurmamız gerekmektedir. Bu da donanımsal olarak bir hayli costly olacaktır.
+
+
+convert these paragraphs into conclusion section with two paragraphs, make it simpler and less detail, just say about the positive and negative sides of the algorithm.
+
+Based on its structure, the algorithm sends request messages to all other nodes when a node initiates a privilege request and awaits their responses. Thus, regardless of the scenario, 2*(N-1) messages are expected for a privilege request. Additionally, depending on the connectivity of the topology, messages may need to be delivered to specific nodes. If all nodes are interconnected, with an edge probability of 1.0, no messages are expected to be forwarded. In the case of a linear topology, the worst-case scenario involves forwarding a total of 2*(N-1)(N-2) messages for requests and replies, respectively, totaling 2(N-1)*(N-2) messages.
+
+The figure above illustrates the total number of messages generated per privilege request concerning the number of nodes and edge probability in the topology. Notably, regardless of the edge probability, the total generated messages remain constant at 2*(N-1).
+
+Similarly, the figure demonstrates the total number of messages forwarded per privilege request concerning the number of nodes and edge probability in the topology. As the edge probability approaches 1.0, the number of forwarded messages tends toward 0. Conversely, decreasing edge probability results in an increase in forwarded messages.
+
+In the event of a node failure in the topology, utilizing system failure detection algorithms allows the failing node to resume operation without affecting others. However, for efficient utilization of this algorithm, establishing a high number of connections between nodes is necessary, which could be costly in terms of hardware resources.
